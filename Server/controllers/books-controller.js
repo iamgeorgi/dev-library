@@ -3,6 +3,7 @@ import { authMiddleware } from '../auth/auth-middleware.js';
 // import createValidator from '../validators/validator-middleware.js';
 import libraryData from '../data/library-data.js';
 import _ from 'lodash';
+import axios from 'axios';
 
 const booksController = express.Router();
 
@@ -17,7 +18,7 @@ booksController
         if (search) {
             bookTitles = await libraryData.searchBy('title', search);
         } else {
-            bookTitles = await libraryData.getAll();
+            bookTitles = await axios.get('https://api.itbook.store/1.0/new').then(res => res.data.books);
         }
         res.status(200).json(bookTitles);
     })
