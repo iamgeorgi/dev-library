@@ -4,9 +4,11 @@ import createPersonSchema from '../validators/create-person.js';
 import loginSchema from '../validators/login-validation.js';
 import bcrypt from 'bcrypt';
 import libraryData from '../data/library-data.js';
+import { regUser } from '../data/hasura/mutations.js';
+import { getUserPassword, userInfo } from '../data/hasura/queries.js';
 import serviceErrors from '../services/service-errors.js';
 import { authMiddleware } from '../auth/auth-middleware.js';
-import createToken from '../auth/create-token.js'
+import createToken from '../auth/create-token.js';
 
 const usersController = express.Router();
 
@@ -19,10 +21,10 @@ usersController
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const { username } = req.body;
 
-        const compareUsername = await libraryData.doesUsernameExist('name', username);
+        // const compareUsername = await libraryData.doesUsernameExist('name', username);
 
-        if (compareUsername) {
-            await libraryData.regUser(username, hashedPassword);
+        if (username) {
+            await regUser(username, hashedPassword);
             res.status(200).json({ message: 'New user was added!' });
         } else {
             res.status(403).json({ message: serviceErrors.DUPLICATE_RECORD });
@@ -35,19 +37,19 @@ usersController
     .post('/session', createValidator(loginSchema), async (req, res) => {
         const { username, password } = req.body;
 
-        const compareNames = await libraryData.doesUsernameExist('name', username);
+        // const compareNames = await libraryData.doesUsernameExist('name', username);
 
-        if (compareNames) {
+        if (false) {
             return res.status(400).json({ message: 'Incorrect username!' });
         }
 
-        const userHashedPassword = await libraryData.userHashedPassword('name', username);
+        const userHashedPassword = await getUserPassword(username).then(res => res.data.data.users[0].password);
         const comparePasswords = await bcrypt.compare(password, userHashedPassword);
 
         if (!comparePasswords) {
             return res.status(400).json({ message: 'Incorrect password!' });
         }
-        const user = await libraryData.userDetails(username);
+        const user = await userInfo(username).then(res => res.data.data.users[0]);
         const payload = {
             sub: user.id,
             username: user.name,
