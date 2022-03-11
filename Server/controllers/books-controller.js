@@ -2,6 +2,7 @@ import express from 'express';
 import { authMiddleware } from '../auth/auth-middleware.js';
 // import createValidator from '../validators/validator-middleware.js';
 import libraryData from '../data/library-data.js';
+import { getExtBooks, getExtSingleBook } from '../data/hasura/queries.js';
 import _ from 'lodash';
 import axios from 'axios';
 
@@ -18,7 +19,7 @@ booksController
         if (search) {
             bookTitles = await libraryData.searchBy('title', search);
         } else {
-            bookTitles = await axios.get('https://api.itbook.store/1.0/new').then(res => res.data.books);
+            bookTitles = await getExtBooks().then(res => res.data.books);
         }
         res.status(200).json(bookTitles);
     })
@@ -29,8 +30,8 @@ booksController
      */
     .get('/library/books/:id', authMiddleware, async (req, res) => {
         const { id } = req.params;
-        const book = await libraryData.getBy('id', id);
-
+        const book = await getExtSingleBook(id).then(res => res.data);
+        /** 
         if (!(_.isEmpty(req.query))) {
             await libraryData.setBookRating(req.query.rate, id);
         }
@@ -42,7 +43,7 @@ booksController
             const result = Math.round(sumRateArray / rateArray.length);
             book.rate = result;
         }
-
+        */
         if (!book) {
             return res.status(404).json({ message: 'Book not found!' });
         }

@@ -68,6 +68,8 @@ const SingleBook = (props) => {
             userId: user.sub
         };
 
+        console.log('userInfo', userInfo);
+
         return fetch(`http://localhost:4000/library/books/${id}`, {
             method: 'POST',
             body: JSON.stringify(userInfo),

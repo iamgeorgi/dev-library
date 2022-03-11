@@ -28,6 +28,8 @@ const MainView = (props) => {
         return <Loading />
     }
 
+    console.log('allBooks', allBooks);
+
     return (
         <>
             <section>
@@ -49,10 +51,10 @@ const MainView = (props) => {
                                         {
                                             props.dataFromSearch.map((book) => {
                                                 return (
-                                                    <div className="single-book" key={book.id}>
-                                                        <img src={book.img} className="book" onClick={() => redirect(book.id)} alt={book.title}></img>
+                                                    <div className="single-book" key={book.isbn13}>
+                                                        <img src={book.image} className="book" onClick={() => redirect(book.isbn13)} alt={book.title}></img>
                                                         <h3>{book.title}</h3>
-                                                        <p>{book.author}</p>
+                                                        <p>{book.price}</p>
                                                         <div className="rating-stars">
                                                             <img src={ratingStar} className=" rating rating-1" alt="rating-star"></img>
                                                             <img src={ratingStar} className=" rating rating-2" alt="rating-star"></img>
@@ -71,6 +73,7 @@ const MainView = (props) => {
                             <>
                                 {
                                     allBooks.map((book) => {
+                                        console.log('enters here1');
                                         return (
                                             <div className="single-book" key={book.id}>
                                                 <img src={book.img} className="book" onClick={() => redirect(book.id)} alt={book.title}></img>
